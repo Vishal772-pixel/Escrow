@@ -1,6 +1,6 @@
 import React from "react";
-import Navbar from "../components/landing/navbar.tsx";
-import Hero from "../components/landing/hero.tsx";
+import Navbar from "../components/landing/navbar";
+import Hero from "../components/landing/hero";
 
 
 const Home: React.FC = () => {

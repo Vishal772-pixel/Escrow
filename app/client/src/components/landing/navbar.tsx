@@ -1,168 +1,102 @@
-import React, { useState } from "react";
+"use client"
 
-const Navbar: React.FC = () => {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isLoginForm, setIsLoginForm] = useState(true); // toggle between login/signup
-  const [formData, setFormData] = useState({ name: "", email: "", password: "", role: "buyer" });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+import { useState } from "react"
+import { Button } from "@/components/ui/button"
+import { Menu, X, Wallet, TrendingUp, ArrowLeftRight, Shield } from "lucide-react"
 
-  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
-  const toggleForm = () => {
-    setIsLoginForm(!isLoginForm);
-    setError(null);
-    setSuccess(null);
-    setFormData({ name: "", email: "", password: "", role: "buyer" }); // reset form
-  };
+interface NavbarProps {
+  onLoginOpen: () => void
+  onSignupOpen: () => void
+}
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+export const Navbar({ onLoginOpen, onSignupOpen }: NavbarProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
-
-    const url = isLoginForm
-      ? "https://localhost:3000/api/v1/login"
-      : "https://localhost:3000/api/v1/register";
-
-    const payload = isLoginForm
-      ? { email: formData.email, password: formData.password }
-      : { name: formData.name, email: formData.email, password: formData.password, role: formData.role };
-
-    try {
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.message || "Something went wrong");
-      }
-
-      const data = await res.json();
-      setSuccess(isLoginForm ? "Login successful!" : "Signup successful!");
-      setFormData({ name: "", email: "", password: "", role: "buyer" });
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const navItems = [
+    { name: "Lending", href: "#lending", icon: TrendingUp },
+    { name: "Borrowing", href: "#borrowing", icon: Wallet },
+    { name: "Swap", href: "#swap", icon: ArrowLeftRight },
+    { name: "Security", href: "#security", icon: Shield },
+  ]
 
   return (
-    <>
-    <nav className="bg-white border-b border-gray-200 px-4 py-3 md:flex md:items-center md:justify-between">
-      <div className="flex items-center justify-between">
-        <div className="text-xl font-bold text-gray-800">MyApp</div>
+    <nav className="fixed top-0 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <h1 className="text-2xl font-bold text-primary">Escrow</h1>
+            </div>
+          </div>
 
-        {/* Mobile menu button */}
-        <button
-          onClick={toggleMobileMenu}
-          className="md:hidden text-gray-700 focus:outline-none"
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          )}
-        </button>
-      </div>
+          {/* Desktop Navigation */}
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-baseline space-x-4">
+              {navItems.map((item) => {
+                const Icon = item.icon
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className="flex items-center gap-2 text-foreground hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    <Icon className="h-4 w-4" />
+                    {item.name}
+                  </a>
+                )
+              })}
+            </div>
+          </div>
 
-      {/* Menu */}
-      <div
-        className={`mt-3 md:mt-0 md:flex md:items-center ${mobileMenuOpen ? "block" : "hidden"}`}
-      >
-        {/* Login/Signup toggle buttons */}
-        <div className="flex space-x-4 mb-4 md:mb-0 md:mr-6">
-          <button
-            onClick={() => setIsLoginForm(true)}
-            className={`px-4 py-2 rounded ${
-              isLoginForm ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            Login
-          </button>
-          <button
-            onClick={() => setIsLoginForm(false)}
-            className={`px-4 py-2 rounded ${
-              !isLoginForm ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"
-            }`}
-          >
-            Signup
-          </button>
+          {/* Desktop Auth Buttons */}
+          <div className="hidden md:block">
+            <div className="ml-4 flex items-center md:ml-6 space-x-3">
+              <Button variant="ghost" onClick={onLoginOpen}>
+                Login
+              </Button>
+              <Button onClick={onSignupOpen}>Sign Up</Button>
+            </div>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <Button variant="ghost" size="sm" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
+          </div>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-3 w-72">
-          {!isLoginForm && (
-            <>
-              <input
-                type="text"
-                name="name"
-                placeholder="Name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="px-3 py-2 border border-gray-300 rounded"
-              />
-              <select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                required
-                className="px-3 py-2 border border-gray-300 rounded"
-              >
-                <option value="buyer">Buyer</option>
-                <option value="seller">Seller</option>
-              </select>
-            </>
-          )}
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            className="px-3 py-2 border border-gray-300 rounded"
-          />
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            className="px-3 py-2 border border-gray-300 rounded"
-          />
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-          >
-            {loading ? "Please wait..." : isLoginForm ? "Login" : "Signup"}
-          </button>
-
-          {error && <p className="text-red-600 text-sm">{error}</p>}
-          {success && <p className="text-green-600 text-sm">{success}</p>}
-        </form>
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-border">
+              {navItems.map((item) => {
+                const Icon = item.icon
+                return (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className="flex items-center gap-2 text-foreground hover:text-primary block px-3 py-2 rounded-md text-base font-medium transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Icon className="h-4 w-4" />
+                    {item.name}
+                  </a>
+                )
+              })}
+              <div className="flex flex-col space-y-2 pt-4">
+                <Button variant="ghost" onClick={onLoginOpen} className="justify-start">
+                  Login
+                </Button>
+                <Button onClick={onSignupOpen} className="justify-start">
+                  Sign Up
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </nav>
-    </>
-  );
-};
-
-export default Navbar;
+  )
+}
