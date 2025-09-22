@@ -2,17 +2,15 @@
   "name": "app",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "type": "module",
-
   "scripts": {
-    "dev:server": "nodemon /server/src/index.ts",
-    "dev:client": "vite --config vite.config.ts",
+    "dev:server": "nodemon --exec ts-node server/src/index.ts",
+    "dev:client": "vite",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev"
   },
-
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -22,10 +20,12 @@
     "@types/node": "^24.5.0",
     "@types/react": "^18.3.24",
     "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^5.0.3",
     "nodemon": "^3.1.10",
     "prisma": "^6.16.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "vite": "^7.1.7"
   },
   "dependencies": {
     "@prisma/client": "^6.16.2",
